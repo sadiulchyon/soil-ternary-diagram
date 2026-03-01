@@ -219,13 +219,15 @@ export default function SoilTernary() {
   const className = classifyTexture(pt.clay, pt.silt, pt.sand);
   const region    = REGION_MAP[className] ?? { name: className, color: "#888", light: "#aaa" };
 
-  // Convert pixel click to ternary coords
+  // Convert pixel click/touch to ternary coords
   const fromEvent = useCallback((e) => {
     const svg  = svgRef.current;
     if (!svg) return null;
     const rect = svg.getBoundingClientRect();
-    const px   = (e.clientX - rect.left)  * (W / rect.width);
-    const py   = (e.clientY - rect.top)   * (H / rect.height);
+    const src  = e.touches ? e.touches[0] : e;
+    if (!src) return null;
+    const px   = (src.clientX - rect.left) * (W / rect.width);
+    const py   = (src.clientY - rect.top)  * (H / rect.height);
     const t    = xyToTri(px, py, CX, CY, SIZE);
     if (t.clay < 0 || t.silt < 0 || t.sand < 0) return null;
     return {
@@ -342,7 +344,7 @@ export default function SoilTernary() {
           USDA Soil Texture Classification
         </div>
         <div style={{ fontSize: "11px", color: "#7a6a50", marginTop: "3px", fontStyle: "italic" }}>
-          Click or drag inside the triangle · Source: USDA NRCS
+          Tap or drag inside the triangle · Source: USDA NRCS
         </div>
       </div>
 
@@ -359,11 +361,15 @@ export default function SoilTernary() {
             borderRadius: "4px",
             boxShadow: "0 2px 12px rgba(0,0,0,0.10)",
             maxWidth: "100%",
+            touchAction: "none",
           }}
           onMouseDown={onDown}
           onMouseMove={onMove}
           onMouseUp={onUp}
           onMouseLeave={onUp}
+          onTouchStart={onDown}
+          onTouchMove={onMove}
+          onTouchEnd={onUp}
         >
           <defs>
             <clipPath id="triClip2">
