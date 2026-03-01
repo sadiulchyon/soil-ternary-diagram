@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 
 // ─── USDA Classification ────────────────────────────────────────────────────
 // All checks: clay, silt, sand as fractions 0-1
@@ -237,19 +237,6 @@ export default function SoilTernary() {
     };
   }, []);
 
-  // Prevent page scroll while touching the diagram
-  useEffect(() => {
-    const svg = svgRef.current;
-    if (!svg) return;
-    const block = (e) => e.preventDefault();
-    svg.addEventListener("touchstart", block, { passive: false });
-    svg.addEventListener("touchmove",  block, { passive: false });
-    return () => {
-      svg.removeEventListener("touchstart", block);
-      svg.removeEventListener("touchmove",  block);
-    };
-  }, []);
-
   const syncInputs = (newPt) => {
     setInputVals({
       clay: String(Math.round(newPt.clay * 100)),
@@ -374,6 +361,7 @@ export default function SoilTernary() {
             borderRadius: "4px",
             boxShadow: "0 2px 12px rgba(0,0,0,0.10)",
             maxWidth: "100%",
+            touchAction: "none",
           }}
           onMouseDown={onDown}
           onMouseMove={onMove}
