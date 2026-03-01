@@ -219,15 +219,13 @@ export default function SoilTernary() {
   const className = classifyTexture(pt.clay, pt.silt, pt.sand);
   const region    = REGION_MAP[className] ?? { name: className, color: "#888", light: "#aaa" };
 
-  // Convert pixel click/touch to ternary coords
+  // Convert pixel click to ternary coords
   const fromEvent = useCallback((e) => {
     const svg  = svgRef.current;
     if (!svg) return null;
     const rect = svg.getBoundingClientRect();
-    const src  = e.touches ? e.touches[0] : e;
-    if (!src) return null;
-    const px   = (src.clientX - rect.left) * (W / rect.width);
-    const py   = (src.clientY - rect.top)  * (H / rect.height);
+    const px   = (e.clientX - rect.left)  * (W / rect.width);
+    const py   = (e.clientY - rect.top)   * (H / rect.height);
     const t    = xyToTri(px, py, CX, CY, SIZE);
     if (t.clay < 0 || t.silt < 0 || t.sand < 0) return null;
     return {
@@ -344,36 +342,28 @@ export default function SoilTernary() {
           USDA Soil Texture Classification
         </div>
         <div style={{ fontSize: "11px", color: "#7a6a50", marginTop: "3px", fontStyle: "italic" }}>
-          Tap or drag inside the triangle · Source: USDA NRCS
+          Click or drag inside the triangle · Source: USDA NRCS
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "20px", alignItems: "flex-start", width: "100%", maxWidth: "860px" }}>
+      <div style={{ display: "flex", gap: "20px", alignItems: "flex-start", flexWrap: "wrap", justifyContent: "center" }}>
 
         {/* SVG Triangle */}
         <svg
           ref={svgRef}
-          viewBox={`0 0 ${W} ${H}`}
+          width={W} height={H}
           style={{
-            display: "block",
-            flex: "1 1 auto",
-            minWidth: 0,
-            maxWidth: `${W}px`,
-            height: "auto",
             cursor: drag ? "grabbing" : "crosshair",
             background: "white",
             border: "1px solid #d0c8b8",
             borderRadius: "4px",
             boxShadow: "0 2px 12px rgba(0,0,0,0.10)",
-            touchAction: "none",
+            maxWidth: "100%",
           }}
           onMouseDown={onDown}
           onMouseMove={onMove}
           onMouseUp={onUp}
           onMouseLeave={onUp}
-          onTouchStart={onDown}
-          onTouchMove={onMove}
-          onTouchEnd={onUp}
         >
           <defs>
             <clipPath id="triClip2">
@@ -508,7 +498,7 @@ export default function SoilTernary() {
         </svg>
 
         {/* Info Panel */}
-        <div style={{ width: "210px", flexShrink: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div style={{ width: "210px", display: "flex", flexDirection: "column", gap: "10px" }}>
 
           {/* Classification */}
           <div style={{
