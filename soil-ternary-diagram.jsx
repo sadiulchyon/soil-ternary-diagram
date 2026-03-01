@@ -348,7 +348,7 @@ export default function SoilTernary() {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "20px", alignItems: "flex-start", flexWrap: "wrap", justifyContent: "center" }}>
+      <div style={{ display: "flex", gap: "20px", alignItems: "flex-start", width: "100%", maxWidth: "860px" }}>
 
         {/* SVG Triangle */}
         <svg
@@ -356,9 +356,10 @@ export default function SoilTernary() {
           viewBox={`0 0 ${W} ${H}`}
           style={{
             display: "block",
-            width: "100%",
-            height: "auto",
+            flex: "1 1 auto",
+            minWidth: 0,
             maxWidth: `${W}px`,
+            height: "auto",
             cursor: drag ? "grabbing" : "crosshair",
             background: "white",
             border: "1px solid #d0c8b8",
@@ -507,7 +508,7 @@ export default function SoilTernary() {
         </svg>
 
         {/* Info Panel */}
-        <div style={{ width: "min(210px, 100%)", display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div style={{ width: "210px", flexShrink: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
 
           {/* Classification */}
           <div style={{
