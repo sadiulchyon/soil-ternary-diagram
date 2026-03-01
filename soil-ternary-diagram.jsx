@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 // ─── USDA Classification ────────────────────────────────────────────────────
 // All checks: clay, silt, sand as fractions 0-1
@@ -219,19 +219,34 @@ export default function SoilTernary() {
   const className = classifyTexture(pt.clay, pt.silt, pt.sand);
   const region    = REGION_MAP[className] ?? { name: className, color: "#888", light: "#aaa" };
 
-  // Convert pixel click to ternary coords
+  // Convert pixel click/touch to ternary coords
   const fromEvent = useCallback((e) => {
     const svg  = svgRef.current;
     if (!svg) return null;
     const rect = svg.getBoundingClientRect();
-    const px   = (e.clientX - rect.left)  * (W / rect.width);
-    const py   = (e.clientY - rect.top)   * (H / rect.height);
+    const src  = e.touches ? e.touches[0] : e;
+    if (!src) return null;
+    const px   = (src.clientX - rect.left) * (W / rect.width);
+    const py   = (src.clientY - rect.top)  * (H / rect.height);
     const t    = xyToTri(px, py, CX, CY, SIZE);
     if (t.clay < 0 || t.silt < 0 || t.sand < 0) return null;
     return {
       clay: Math.max(0, Math.min(1, t.clay)),
       silt: Math.max(0, Math.min(1, t.silt)),
       sand: Math.max(0, Math.min(1, t.sand)),
+    };
+  }, []);
+
+  // Prevent page scroll while touching the diagram
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const block = (e) => e.preventDefault();
+    svg.addEventListener("touchstart", block, { passive: false });
+    svg.addEventListener("touchmove",  block, { passive: false });
+    return () => {
+      svg.removeEventListener("touchstart", block);
+      svg.removeEventListener("touchmove",  block);
     };
   }, []);
 
@@ -342,7 +357,7 @@ export default function SoilTernary() {
           USDA Soil Texture Classification
         </div>
         <div style={{ fontSize: "11px", color: "#7a6a50", marginTop: "3px", fontStyle: "italic" }}>
-          Click or drag inside the triangle · Source: USDA NRCS
+          Tap or drag inside the triangle · Source: USDA NRCS
         </div>
       </div>
 
@@ -364,6 +379,9 @@ export default function SoilTernary() {
           onMouseMove={onMove}
           onMouseUp={onUp}
           onMouseLeave={onUp}
+          onTouchStart={onDown}
+          onTouchMove={onMove}
+          onTouchEnd={onUp}
         >
           <defs>
             <clipPath id="triClip2">
