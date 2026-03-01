@@ -353,14 +353,17 @@ export default function SoilTernary() {
         {/* SVG Triangle */}
         <svg
           ref={svgRef}
-          width={W} height={H}
+          viewBox={`0 0 ${W} ${H}`}
           style={{
+            display: "block",
+            width: "100%",
+            height: "auto",
+            maxWidth: `${W}px`,
             cursor: drag ? "grabbing" : "crosshair",
             background: "white",
             border: "1px solid #d0c8b8",
             borderRadius: "4px",
             boxShadow: "0 2px 12px rgba(0,0,0,0.10)",
-            maxWidth: "100%",
             touchAction: "none",
           }}
           onMouseDown={onDown}
@@ -504,7 +507,7 @@ export default function SoilTernary() {
         </svg>
 
         {/* Info Panel */}
-        <div style={{ width: "210px", display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div style={{ width: "min(210px, 100%)", display: "flex", flexDirection: "column", gap: "10px" }}>
 
           {/* Classification */}
           <div style={{
